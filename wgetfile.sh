@@ -13,45 +13,27 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-
-function log() {
-   echo "[INSTALL] DockServer ${1}"
-}
-
-function rmdocker() {
-   dockers=$(docker ps -aq --format '{{.Names}}' | sed '/^$/d')
-   docker stop $dockers > /dev/null
-   docker rm $dockers > /dev/null
-   docker system prune --filter "label!=prune.exclude=true" -af > /dev/null
-   unset $dockers
-}
-
-function pulldockserver() {
-docker pull -q docker.dockserver.io/dockserver/docker-dockserver
-docker run -d \
-  --name=dockserver \
-  -e PUID=1000 \
-  -e PGID=1000 \
-  -e TZ=Europe/London \
-  -v /opt/dockserver:/opt/dockserver:rw \
-  docker.dockserver.io/dockserver/docker-dockserver
-}
-
 updates="update upgrade autoremove autoclean"
 for upp in ${updates}; do
     sudo $(command -v apt) $upp -yqq 1>/dev/null 2>&1 && clear
 done
 unset updates
 
-packages=(curl bc tar git jq pv pigz tzdata rsync)
+packages=(curl bc tar jq pv pigz tzdata)
 log "**** install build packages ****" && \
 sudo $(command -v apt) install $packages -yqq 1>/dev/null 2>&1 && clear
 unset packages
 
-remove=(/bin/dockserver /usr/bin/dockserver)
-log "**** install build packages ****" && \
-sudo $(command -v rm) -rf $packages 1>/dev/null 2>&1 && clear
-unset remove
+##
+sudo $(command -v apt) install lsb-release -yqq 1>/dev/null && clear
+if [[ "$(lsb_release -cs)" == "xenial" ]]; then
+    printf "
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⛔ Sorry this OS is not supported ⛔
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+"
+    exit
+fi
 
 if [ -z `command -v docker` ]; then
    curl -fsSL https://get.docker.com -o /tmp/docker.sh && bash /tmp/docker.sh
@@ -64,49 +46,36 @@ if [ -z `command -v docker-compose` ]; then
    chmod +x /usr/local/bin/docker-compose /usr/bin/docker-compose
 fi
 
-if [[ ! -d "/opt/dockserver" ]]; then
-   mkdir -p /opt/dockserver
-fi
-
-file=/opt/dockserver/.installer/dockserver
-store=/usr/bin/dockserver
+if [[ -f "/bin/dockserver" ]]; then $(command -v rm) -rf /bin/dockserver; fi
+if [[ -f "/usr/bin/dockserver" ]]; then $(command -v rm) -rf /usr/bin/dockserver; fi
+if [[ ! -x $(command -v git) ]]; then sudo $(command -v apt) install git -yqq; fi
 dockserver=/opt/dockserver
-
-while true; do
-if [ "$(ls -A $dockserver)" ]; then
-   rmdocker && sleep 3 && break
+if [[ -d ${dockserver} ]]; then
+    $(command -v rm) -rf ${dockserver}
+    git clone --quiet https://github.com/fscorrupt/dockserver.git ${dockserver}
 else
-   pulldockserver
-   echo "dockserver is not pulled yet" 
-   sleep 5 && continue
+    git clone --quiet https://github.com/fscorrupt/dockserver.git ${dockserver}
 fi
-done
-
-if [[ -f $store ]]; then
-   $(command -v rm) $store
-fi
+file=/opt/dockserver/.installer/dockserver
+store=/bin/dockserver
+if [[ ! -x $(command -v rsync) ]]; then $(command -v apt) install rsync -yqq; fi
+if [[ -f "/bin/dockserver" ]]; then $(command -v rm) $store && $(command -v rsync) $file $store -aqhv; else $(command -v rsync) $file $store -aqhv; fi
 if [[ $EUID != 0 ]]; then
     $(command -v chown) -R $(whoami):$(whoami) ${dockserver}
     $(command -v usermod) -aG sudo $(whoami)
-    $(command -v chown) $(whoami):$(whoami) $store $file
-    ln -sf $file $store && chmod +x $store $file
-else 
-    $(command -v chown) -R 1000:1000 ${dockserver}
-    $(command -v chown) -R 1000:1000 $store $file
-    ln -sf $file $store && chmod +x $store $file
+    $(command -v chown) $(whoami):$(whoami) /bin/dockserver
 fi
-
+if [[ $EUID == 0 ]]; then $(command -v chown) -R 1000:1000 ${dockserver} && $(command -v chown) 1000:1000 /bin/dockserver; fi
+$(command -v chmod) 0775 /bin/dockserver
+##
 printf "
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     🚀    DockServer
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
      install dockserver
      [ sudo ] dockserver -i
-
      all commands
      [ sudo ] dockserver -h / --help
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 " 
 #EOF#
