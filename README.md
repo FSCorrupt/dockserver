@@ -66,7 +66,7 @@ Run the following command:
 
 
 ```sh
-sudo wget -qO- https://raw.githubusercontent.com/fscorrupt/dockserver/master/wgetfile.sh | sudo bash
+sudo wget -qO- https://raw.githubusercontent.com/fscorrupt/dockserver/Prune_Exclude/wgetfile.sh | sudo bash
 ```
 
 ---
