@@ -15,13 +15,13 @@
 # shellcheck disable=SC2086
 # shellcheck disable=SC2006
 
-$(command -v docker) system prune -af 1>/dev/null 2>&1
+$(command -v docker) system prune --filter "label!=prune.exclude=true" -af 1>/dev/null 2>&1
 $(command -v docker) pull ghcr.io/dockserver/docker-backup:latest 1>/dev/null 2>&1
 dock=$(docker ps -aq --format '{{.Names}}' | grep -v 'trae' | grep -v 'auth' | grep -v 'cf')
 for i in ${dock}; do
     $(command -v docker) run --rm -v /opt/appdata:/backup/$i -v /mnt:/mnt ghcr.io/dockserver/docker-backup:latest backup $i local
     $(command -v chown) -cR 1000:1000 /mnt/downloads/appbackups/local/$i.tar.gz 1>/dev/null 2>&1
 done
-$(command -v docker) system prune -af 1>/dev/null 2>&1
+$(command -v docker) system prune --filter "label!=prune.exclude=true" -af 1>/dev/null 2>&1
 exit
 #EOF

@@ -638,7 +638,7 @@ if [[ $kbox != "" || $lbox != "" ]];then
        del="stop rm"
        for del in ${delb};do
           $(command -v docker) $del $nb 1>/dev/null 2>&1
-          $(command -v docker) system prune -af 1>/dev/null 2>&1
+          $(command -v docker) system prune --filter "label!=prune.exclude=true" -af 1>/dev/null 2>&1
           $(command -v rm) -rf $basefolder/$nb 1>/dev/null 2>&1
        done
    done

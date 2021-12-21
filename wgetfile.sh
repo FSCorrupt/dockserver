@@ -22,7 +22,7 @@ function rmdocker() {
    dockers=$(docker ps -aq --format '{{.Names}}' | sed '/^$/d')
    docker stop $dockers > /dev/null
    docker rm $dockers > /dev/null
-   docker system prune -af > /dev/null
+   docker system prune --filter "label!=prune.exclude=true" -af > /dev/null
    unset $dockers
 }
 

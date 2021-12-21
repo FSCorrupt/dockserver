@@ -27,7 +27,7 @@ appstartup() {
   done
 }
 run() {
-  $(command -v docker) system prune -af
+  $(command -v docker) system prune --filter "label!=prune.exclude=true" -af
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo " ✅ Prune Completed Successfully "

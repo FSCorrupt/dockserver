@@ -38,7 +38,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
      if [[ -f $basefolder/$compose ]];then
         $(command -v cd) $basefolder/compose/ && docker-compose config 1>/dev/null 2>&1
         $(command -v cd) $basefolder/compose/ && docker-compose down 1>/dev/null 2>&1
-        $(command -v docker) system prune -af 1>/dev/null 2>&1
+        $(command -v docker) system prune --filter "label!=prune.exclude=true" -af 1>/dev/null 2>&1
         $(command -v cd) $basefolder/compose/ && docker-compose up -d --force-recreate 1>/dev/null 2>&1
      fi
      $(command -v chown) -cR 1000:1000 ${dockserver} 1>/dev/null 2>&1
