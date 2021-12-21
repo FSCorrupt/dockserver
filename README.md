@@ -64,19 +64,10 @@ _Docker + Traefik with Authelia and Cloudflare Protection_
 
 Run the following command:
 
-```sh
-sudo wget -qO- https://git.io/J3GDc | sudo bash
-```
-
-<details>
-  <summary>Long commmand if the short one doesn't work.</summary>
-  <br />
 
 ```sh
 sudo wget -qO- https://raw.githubusercontent.com/fscorrupt/dockserver/master/wgetfile.sh | sudo bash
 ```
-
-</details>
 
 ---
 
