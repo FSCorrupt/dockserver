@@ -73,7 +73,7 @@ sudo wget -qO- https://git.io/J3GDc | sudo bash
   <br />
 
 ```sh
-sudo wget -qO- https://raw.githubusercontent.com/dockserver/dockserver/master/wgetfile.sh | sudo bash
+sudo wget -qO- https://raw.githubusercontent.com/fscorrupt/dockserver/master/wgetfile.sh | sudo bash
 ```
 
 </details>
