@@ -52,20 +52,20 @@ if [[ ! -x $(command -v git) ]]; then sudo $(command -v apt) install git -yqq; f
 dockserver=/opt/dockserver
 if [[ -d ${dockserver} ]]; then
     $(command -v rm) -rf ${dockserver}
-    git clone --quiet https://github.com/fscorrupt/dockserver.git ${dockserver}
+    git clone --quiet https://github.com/fscorrupt/dockserver.git $dockserver
 else
-    git clone --quiet https://github.com/fscorrupt/dockserver.git ${dockserver}
+    git clone --quiet https://github.com/fscorrupt/dockserver.git $dockserver
 fi
 file=/opt/dockserver/.installer/dockserver
 store=/bin/dockserver
 if [[ ! -x $(command -v rsync) ]]; then $(command -v apt) install rsync -yqq; fi
 if [[ -f "/bin/dockserver" ]]; then $(command -v rm) $store && $(command -v rsync) $file $store -aqhv; else $(command -v rsync) $file $store -aqhv; fi
 if [[ $EUID != 0 ]]; then
-    $(command -v chown) -R $(whoami):$(whoami) ${dockserver}
+    $(command -v chown) -R $(whoami):$(whoami) $dockserver
     $(command -v usermod) -aG sudo $(whoami)
     $(command -v chown) $(whoami):$(whoami) /bin/dockserver
 fi
-if [[ $EUID == 0 ]]; then $(command -v chown) -R 1000:1000 ${dockserver} && $(command -v chown) 1000:1000 /bin/dockserver; fi
+if [[ $EUID == 0 ]]; then $(command -v chown) -R 1000:1000 $dockserver && $(command -v chown) 1000:1000 /bin/dockserver; fi
 $(command -v chmod) 0775 /bin/dockserver
 ##
 printf "
