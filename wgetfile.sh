@@ -52,9 +52,9 @@ if [[ ! -x $(command -v git) ]]; then sudo $(command -v apt) install git -yqq; f
 dockserver=/opt/dockserver
 if [[ -d ${dockserver} ]]; then
     $(command -v rm) -rf ${dockserver}
-    git clone --quiet https://github.com/fscorrupt/dockserver.git $dockserver
+    git clone --branch spielewiese --quiet https://github.com/fscorrupt/dockserver.git $dockserver
 else
-    git clone --quiet https://github.com/fscorrupt/dockserver.git $dockserver
+    git clone --branch spielewiese --quiet https://github.com/fscorrupt/dockserver.git $dockserver
 fi
 file=/opt/dockserver/.installer/dockserver
 store=/bin/dockserver
